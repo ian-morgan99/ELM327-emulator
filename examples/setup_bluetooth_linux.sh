@@ -35,9 +35,17 @@ fi
 
 echo ""
 echo "Setting up RFCOMM device..."
-# Create RFCOMM device with more restrictive permissions (660)
-mknod -m 660 /dev/rfcomm0 c 216 0 2>/dev/null || echo "RFCOMM device already exists"
-chown $SUDO_USER:$SUDO_USER /dev/rfcomm0
+# Create RFCOMM device with secure permissions (660) and proper group ownership
+if id -nG "$SUDO_USER" | grep -qw "dialout"; then
+    # User is in dialout group, use that for group ownership
+    mknod -m 660 /dev/rfcomm0 c 216 0 2>/dev/null || echo "RFCOMM device already exists"
+    chown $SUDO_USER:dialout /dev/rfcomm0
+else
+    # Fallback to user's primary group
+    mknod -m 660 /dev/rfcomm0 c 216 0 2>/dev/null || echo "RFCOMM device already exists"
+    chown $SUDO_USER:$SUDO_USER /dev/rfcomm0
+    echo "Note: Consider adding user to 'dialout' group for better device access"
+fi
 
 echo ""
 echo "Starting Bluetooth service..."

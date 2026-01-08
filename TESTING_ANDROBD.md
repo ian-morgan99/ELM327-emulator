@@ -88,8 +88,8 @@ Bluetooth testing allows you to simulate real-world Bluetooth OBD-II adapters.
    ```bash
    sudo service bluetooth restart
    sdptool add --channel=1 SP
-   sudo mknod -m 666 /dev/rfcomm0 c 216 0
-   sudo chown $USER /dev/rfcomm0
+   sudo mknod -m 660 /dev/rfcomm0 c 216 0
+   sudo chown $USER:$USER /dev/rfcomm0
    ```
 
 4. **Start the emulator:**
