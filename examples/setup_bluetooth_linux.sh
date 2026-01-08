@@ -18,13 +18,26 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 echo "Installing Bluetooth tools..."
-apt-get update
-apt-get install -y bluez
+echo "Note: This script is designed for Ubuntu/Debian systems"
+if command -v apt-get &> /dev/null; then
+    apt-get update
+    apt-get install -y bluez
+elif command -v dnf &> /dev/null; then
+    dnf install -y bluez
+elif command -v yum &> /dev/null; then
+    yum install -y bluez
+elif command -v pacman &> /dev/null; then
+    pacman -S --noconfirm bluez
+else
+    echo "Error: Unsupported package manager. Please install 'bluez' manually."
+    exit 1
+fi
 
 echo ""
 echo "Setting up RFCOMM device..."
-mknod -m 666 /dev/rfcomm0 c 216 0 2>/dev/null || echo "RFCOMM device already exists"
-chown $SUDO_USER /dev/rfcomm0
+# Create RFCOMM device with more restrictive permissions (660)
+mknod -m 660 /dev/rfcomm0 c 216 0 2>/dev/null || echo "RFCOMM device already exists"
+chown $SUDO_USER:$SUDO_USER /dev/rfcomm0
 
 echo ""
 echo "Starting Bluetooth service..."

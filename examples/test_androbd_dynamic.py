@@ -7,6 +7,22 @@ from elm import Elm
 import time
 import math
 
+# Response format templates for dynamic values
+SPEED_RESPONSE_TEMPLATE = (
+    '<header>7E8</header><size>03</size><subd>41 0D</subd>'
+    '<eval>"%.2X" % {value}</eval><space /><writeln />'
+)
+
+RPM_RESPONSE_TEMPLATE = (
+    '<header>7E8</header><size>04</size><subd>41 0C</subd>'
+    '<eval>"%.4X" % int(4 * {value})</eval><space /><writeln />'
+)
+
+ENGINE_LOAD_RESPONSE_TEMPLATE = (
+    '<header>7E8</header><size>03</size><subd>41 04</subd>'
+    '<eval>"%.2X" % int({value} * 2.55)</eval><space /><writeln />'
+)
+
 def simulate_driving():
     """Simulate a driving scenario with realistic changing values"""
     
@@ -65,20 +81,11 @@ def simulate_driving():
                 load = max(0, min(255, load))
                 
                 # Update the emulator with dynamic values
-                emulator.answer['SPEED'] = (
-                    f'<header>7E8</header><size>03</size><subd>41 0D</subd>'
-                    f'<eval>"%.2X" % {speed}</eval><space /><writeln />'
-                )
+                emulator.answer['SPEED'] = SPEED_RESPONSE_TEMPLATE.format(value=speed)
                 
-                emulator.answer['RPM'] = (
-                    f'<header>7E8</header><size>04</size><subd>41 0C</subd>'
-                    f'<eval>"%.4X" % int(4 * {rpm})</eval><space /><writeln />'
-                )
+                emulator.answer['RPM'] = RPM_RESPONSE_TEMPLATE.format(value=rpm)
                 
-                emulator.answer['ENGINE_LOAD'] = (
-                    f'<header>7E8</header><size>03</size><subd>41 04</subd>'
-                    f'<eval>"%.2X" % int({load} * 2.55)</eval><space /><writeln />'
-                )
+                emulator.answer['ENGINE_LOAD'] = ENGINE_LOAD_RESPONSE_TEMPLATE.format(value=load)
                 
                 # Print status every 5 seconds
                 if int(elapsed) % 5 == 0 and elapsed - int(elapsed) < 0.1:

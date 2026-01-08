@@ -14,9 +14,16 @@ echo "ELM327 Emulator - AndrOBD WiFi Test Setup"
 echo "=========================================="
 echo ""
 
-# Check if elm is installed
+# Check if Python 3 is installed
 if ! command -v python3 &> /dev/null; then
     echo "Error: Python 3 is not installed"
+    exit 1
+fi
+
+# Check if elm module is installed
+if ! python3 -c "import elm" 2>/dev/null; then
+    echo "Error: ELM327-emulator is not installed"
+    echo "Install it with: pip install ELM327-emulator"
     exit 1
 fi
 
