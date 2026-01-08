@@ -36,15 +36,24 @@ fi
 echo ""
 echo "Setting up RFCOMM device..."
 # Create RFCOMM device with secure permissions (660) and proper group ownership
-if id -nG "$SUDO_USER" | grep -qw "dialout"; then
-    # User is in dialout group, use that for group ownership
-    mknod -m 660 /dev/rfcomm0 c 216 0 2>/dev/null || echo "RFCOMM device already exists"
-    chown $SUDO_USER:dialout /dev/rfcomm0
+if [ ! -e /dev/rfcomm0 ]; then
+    mknod -m 660 /dev/rfcomm0 c 216 0
+    echo "RFCOMM device created"
+    
+    # Set proper ownership
+    if id -nG "$SUDO_USER" | grep -qw "dialout"; then
+        # User is in dialout group, use that for group ownership
+        chown $SUDO_USER:dialout /dev/rfcomm0
+        echo "Device ownership set to $SUDO_USER:dialout"
+    else
+        # Fallback to user's primary group
+        chown $SUDO_USER:$SUDO_USER /dev/rfcomm0
+        echo "Device ownership set to $SUDO_USER:$SUDO_USER"
+        echo "Note: Consider adding user to 'dialout' group for better device access"
+    fi
 else
-    # Fallback to user's primary group
-    mknod -m 660 /dev/rfcomm0 c 216 0 2>/dev/null || echo "RFCOMM device already exists"
-    chown $SUDO_USER:$SUDO_USER /dev/rfcomm0
-    echo "Note: Consider adding user to 'dialout' group for better device access"
+    echo "RFCOMM device already exists"
+    echo "Current ownership: $(stat -c '%U:%G' /dev/rfcomm0 2>/dev/null || stat -f '%Su:%Sg' /dev/rfcomm0)"
 fi
 
 echo ""

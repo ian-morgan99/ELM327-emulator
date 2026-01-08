@@ -8,6 +8,8 @@ import time
 import math
 
 # Response format templates for dynamic values
+# Note: These use the emulator's native XML-like format with <eval> tags containing
+# Python expressions. The {value} placeholder is replaced using Python's format() method.
 SPEED_RESPONSE_TEMPLATE = (
     '<header>7E8</header><size>03</size><subd>41 0D</subd>'
     '<eval>"%.2X" % {value}</eval><space /><writeln />'
