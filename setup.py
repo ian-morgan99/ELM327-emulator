@@ -38,7 +38,7 @@ def versions(pkg_name, site):
     try:
         releases = json.loads(request.urlopen(url).read())['releases']
     except Exception as e:
-        print("Error while getting data from URL '" + url + "': " + e)
+        print("Error while getting data from URL '" + url + "': " + str(e))
         return []
     return sorted(releases, key=parse_version, reverse=True)
 
